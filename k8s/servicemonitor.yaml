@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: weather-bot
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: weather-bot
+  endpoints:
+  - port: metrics
+    path: /metrics
+  namespaceSelector:
+    matchNames:
+    - default
