@@ -1,7 +1,48 @@
 stages:
   - test
+  - build
+  - deploy
 
-echo_test:
+variables:
+  CI_REGISTRY: "192.168.0.199:5050"
+  CI_REGISTRY_IMAGE: "$CI_REGISTRY/root/devops"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+cache:
+  paths:
+    - go.sum
+    - vendor/
+
+test:
   stage: test
+  image: golang:1.23-alpine
   script:
-    - echo "This is a test pipeline!"
+    - go mod download
+    - go test -v ./...
+  only:
+    - main
+
+build:
+  stage: build
+  image: docker:27.0.3
+  services:
+    - docker:dind
+  before_script:
+    - mkdir -p /etc/docker
+    - echo '{"insecure-registries":["192.168.0.199:5050"]}' > /etc/docker/daemon.json
+    - docker login -u root -p "$GITLAB_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl set image deployment/weather-bot bot=$CI_REGISTRY_IMAGE:latest -n default --record
+    - kubectl rollout status deployment/weather-bot -n default
+  only:
+    - main
