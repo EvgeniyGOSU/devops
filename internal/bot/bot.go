@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"time"
 
+	"weather-scanner-bot/internal/metrics"
 	"weather-scanner-bot/internal/weather"
 
 	"github.com/go-telegram/bot"
@@ -38,7 +39,7 @@ func New(token string, weatherClient *weather.Client) (*WeatherBot, error) {
 
 func (wb *WeatherBot) startHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	// Увеличиваем счётчик запросов /start
-	IncrementRequests("start")
+	metrics.IncrementRequests("start")
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
@@ -51,7 +52,7 @@ func (wb *WeatherBot) weatherHandler(ctx context.Context, b *bot.Bot, update *mo
 	command := "weather"
 
 	// Увеличиваем счётчик запросов /weather
-	IncrementRequests(command)
+	metrics.IncrementRequests(command)
 
 	// Извлекаем название города из команды
 	re := regexp.MustCompile(`^/weather\s+(.+)`)
@@ -59,13 +60,13 @@ func (wb *WeatherBot) weatherHandler(ctx context.Context, b *bot.Bot, update *mo
 
 	if len(matches) < 2 {
 		// Увеличиваем счётчик ошибок (неверный формат)
-		IncrementErrors("invalid_format")
+		metrics.IncrementErrors("invalid_format")
 
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.Message.Chat.ID,
 			Text:   "❌ Укажите город: /weather Москва",
 		})
-		ObserveDuration(command, time.Since(startTime).Seconds())
+		metrics.ObserveDuration(command, time.Since(startTime).Seconds())
 		return
 	}
 
@@ -73,13 +74,13 @@ func (wb *WeatherBot) weatherHandler(ctx context.Context, b *bot.Bot, update *mo
 	weatherData, err := wb.weatherClient.GetWeather(city)
 	if err != nil {
 		// Увеличиваем счётчик ошибок API
-		IncrementErrors("api_error")
+		metrics.IncrementErrors("api_error")
 
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.Message.Chat.ID,
 			Text:   fmt.Sprintf("❌ Ошибка: %s", err),
 		})
-		ObserveDuration(command, time.Since(startTime).Seconds())
+		metrics.ObserveDuration(command, time.Since(startTime).Seconds())
 		return
 	}
 
@@ -99,7 +100,7 @@ func (wb *WeatherBot) weatherHandler(ctx context.Context, b *bot.Bot, update *mo
 	})
 
 	// Записываем время выполнения успешного запроса
-	ObserveDuration(command, time.Since(startTime).Seconds())
+	metrics.ObserveDuration(command, time.Since(startTime).Seconds())
 }
 
 func (wb *WeatherBot) Start(ctx context.Context) {
