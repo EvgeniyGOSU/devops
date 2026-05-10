@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hysteria-config
+data:
+  config.json: |
+    {
+      "server": "gosuai.mooo.com:443",
+      "auth": "DevOps:b291e18e2db2e787c2bf5e25ae8959fa",
+      "tls": {
+        "sni": "gosuai.mooo.com",
+        "insecure": false
+      },
+      "socks5": {
+        "listen": "0.0.0.0:1080"
+      },
+      "transport": {
+        "udp": {
+          "hopInterval": "30s"
+        }
+      }
+    }
