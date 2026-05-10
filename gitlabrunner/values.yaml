@@ -16,10 +16,20 @@ serviceAccount:
 runners:
   config: |
     [[runners]]
-
       [runners.kubernetes]
         namespace = "{{.Release.Namespace}}"
-        image = "alpine"
+        image = "ubuntu:22.04"
         service_account = "runner"
-
-
+        privileged = true
+        
+        # Добавляем hosts, чтобы резолвился gitlab.local (если нужно)
+        [[runners.kubernetes.host_aliases]]
+          ip = "192.168.0.199"
+          hostnames = ["gitlab.local"]
+        
+        # Монтируем docker.sock для DinD
+        [[runners.kubernetes.volumes.host_path]]
+          name = "docker"
+          mount_path = "/var/run/docker.sock"
+          read_only = false
+          host_path = "/var/run/docker.sock"
