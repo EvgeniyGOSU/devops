@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather-bot
+  template:
+    metadata:
+      labels:
+        app: weather-bot
+    spec:
+      containers:
+      - name: bot
+        image: weather-bot:latest
+        imagePullPolicy: Always
+        env:
+        - name: TELEGRAM_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: weather-bot-secret
+              key: TELEGRAM_TOKEN
+        - name: WEATHER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: weather-bot-secret
+              key: WEATHER_API_KEY
+        - name: WEATHER_API_URL
+          value: "https://api.weatherapi.com/v1"
+        - name: PORT
+          value: "8080"
+        ports:
+        - containerPort: 8080

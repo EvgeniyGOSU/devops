@@ -1,0 +1,25 @@
+gitlabUrl: http://192.168.0.199/
+runnerToken: "glrt-GewzbxTtIUXWT6_7igJ-9G86MQpwOjEKdDozCnU6MQ8.01.171qnzxwl"
+
+rbac:
+  create: true
+  rules:
+   - apiGroups: ["*"]
+     resources: ["*"]
+     verbs: ["*"]
+  clusterWideAccess: true
+
+serviceAccount:
+  create: true
+  name: "runner"
+
+runners:
+  config: |
+    [[runners]]
+
+      [runners.kubernetes]
+        namespace = "{{.Release.Namespace}}"
+        image = "alpine"
+        service_account = "runner"
+
+
