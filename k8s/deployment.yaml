@@ -11,6 +11,10 @@ spec:
     metadata:
       labels:
         app: weather-bot
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
     spec:
       imagePullSecrets:
       - name: gitlab-registry
@@ -18,6 +22,10 @@ spec:
       - name: bot
         image: 192.168.0.199:5050/root/devops:latest
         imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        - containerPort: 9090
+          name: metrics
         env:
         - name: TELEGRAM_TOKEN
           valueFrom:
@@ -33,8 +41,6 @@ spec:
           value: "socks5://localhost:1080"
         - name: HTTPS_PROXY
           value: "socks5://localhost:1080"
-        ports:
-        - containerPort: 8080
       - name: hysteria
         image: tobyxdd/hysteria:latest
         command: ["hysteria"]
