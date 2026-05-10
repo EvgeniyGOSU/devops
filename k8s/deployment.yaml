@@ -30,8 +30,28 @@ spec:
               name: weather-bot-secret
               key: WEATHER_API_KEY
         - name: HTTP_PROXY
-          value: "http://hiddify-client-service:12334"
+          value: "socks5://localhost:1080"
         - name: HTTPS_PROXY
-          value: "http://hiddify-client-service:12334"
+          value: "socks5://localhost:1080"
         ports:
         - containerPort: 8080
+      - name: hysteria
+        image: tobyxdd/hysteria:latest
+        command: ["hysteria"]
+        args:
+          - client
+          - -c
+          - /etc/hysteria/config.json
+        ports:
+        - containerPort: 1080
+          protocol: TCP
+        volumeMounts:
+        - name: hysteria-config
+          mountPath: /etc/hysteria
+        env:
+        - name: HYSTERIA_LOG_LEVEL
+          value: "info"
+      volumes:
+      - name: hysteria-config
+        configMap:
+          name: hysteria-config
