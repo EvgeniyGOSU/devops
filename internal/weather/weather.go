@@ -56,4 +56,3 @@ func (c *Client) GetWeather(city string) (*WeatherResponse, error) {
 
 	return &weather, nil
 }
-###
