@@ -42,7 +42,7 @@ deploy:
   stage: deploy
   image: bitnami/kubectl:latest
   script:
-    - kubectl set image deployment/weather-bot bot=$CI_REGISTRY_IMAGE:latest -n default --record
+    - kubectl rollout restart deployment/weather-bot -n default
     - kubectl rollout status deployment/weather-bot -n default
   only:
     - main
