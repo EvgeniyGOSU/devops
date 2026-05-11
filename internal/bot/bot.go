@@ -43,7 +43,7 @@ func (wb *WeatherBot) startHandler(ctx context.Context, b *bot.Bot, update *mode
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
-		Text:   "🌤️ Привет! Я бот погоды.\nОтправь /weather Москва, чтобы узнать погоду.",
+		Text:   "🌤️ Привет! Я бот погоды.\nОтправь /weather Moscow, чтобы узнать погоду.",
 	})
 }
 
@@ -64,7 +64,7 @@ func (wb *WeatherBot) weatherHandler(ctx context.Context, b *bot.Bot, update *mo
 
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.Message.Chat.ID,
-			Text:   "❌ Укажите город: /weather Москва",
+			Text:   "❌ Укажите город: /weather Moscow",
 		})
 		metrics.ObserveDuration(command, time.Since(startTime).Seconds())
 		return
