@@ -1,5 +1,4 @@
 # 🌤️ Weather Scanner Bot
-
 [![GitHub](https://img.shields.io/badge/Telegram-Bot-blue?logo=telegram)](https://t.me/AirQuality174Bot)
 
 **Telegram-бот для погоды с полным CI/CD пайплайном, деплоем в Kubernetes и мониторингом Prometheus + Grafana.**
@@ -22,5 +21,3 @@
 *   **Prometheus**: Собирает метрики приложения (`/metrics`), которые встроены в Go-код.
 *   **Grafana**: Визуализирует количество запросов, ошибок, время ответа. Дашборды доступны через NodePort.
 *   **kube-prometheus-stack**: Полный стек мониторинга для Kubernetes.
-
-## 🏗️ Архитектура проекта
