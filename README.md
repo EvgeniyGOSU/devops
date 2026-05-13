@@ -2,7 +2,7 @@
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/EvgeniyGOSU/devops)](https://github.com/EvgeniyGOSU/devops)
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/EvgeniyGOSU/devops)](https://github.com/EvgeniyGOSU/devops)
-[![GitHub](https://img.shields.io/badge/Telegram-Bot-blue?logo=telegram)](https://t.me/your_bot_link)
+[![GitHub](https://img.shields.io/badge/Telegram-Bot-blue?logo=telegram)](https://t.me/AirQuality174Bot)
 
 **Telegram-бот для погоды с полным CI/CD пайплайном, деплоем в Kubernetes и мониторингом Prometheus + Grafana.**
 
