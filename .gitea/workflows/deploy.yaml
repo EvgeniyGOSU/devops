@@ -15,6 +15,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/v1.36.0/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mv kubectl /usr/local/bin/kubectl
+
       - name: Setup kubeconfig
         run: |
           mkdir -p /root/.kube
@@ -23,6 +29,12 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t weather-bot:latest .
+
+      - name: Save and transfer image
+        run: |
+          docker save weather-bot:latest -o weather-bot.tar
+          # Копируем образ на worker ноду через kubectl cp (сложно)
+          # Проще загрузить образ в локальный реестр или передать через pipe
 
       - name: Deploy to Kubernetes
         run: |
