@@ -1,0 +1,27 @@
+name: Build and Deploy Weather Bot
+
+on:
+  push:
+    branches:
+      - main
+      - test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t weather-bot:latest .
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl rollout restart deployment/weather-bot -n default
+          kubectl rollout status deployment/weather-bot -n default
