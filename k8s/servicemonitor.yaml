@@ -3,6 +3,8 @@ kind: ServiceMonitor
 metadata:
   name: weather-bot
   namespace: weather-bot
+  labels:
+    release: monitoring
 spec:
   selector:
     matchLabels:
@@ -10,6 +12,7 @@ spec:
   endpoints:
   - port: metrics
     path: /metrics
+    interval: 30s
   namespaceSelector:
     matchNames:
-    - default
+    - weather-bot
