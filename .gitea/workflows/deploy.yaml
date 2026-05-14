@@ -32,11 +32,8 @@ jobs:
 
       - name: Push to registry
         run: |
-          kubectl port-forward -n weather-bot svc/registry 5000:5000 &
-          sleep 5
-          docker tag weather-bot:latest localhost:5000/weather-bot:latest
-          docker push localhost:5000/weather-bot:latest
-          kill %1
+          docker tag weather-bot:latest 192.168.181.134:30500/weather-bot:latest
+          docker push 192.168.181.134:30500/weather-bot:latest
 
       - name: Deploy to Kubernetes
         run: |
