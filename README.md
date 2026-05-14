@@ -12,4 +12,4 @@ Telegram бот для получения текущей погоды через
 ```bash
 export TELEGRAM_TOKEN="ваш_токен"
 export WEATHER_API_KEY="ваш_ключ"
-go run cmd/bot/main.go
+go run cmd/bot/main.go# test change
