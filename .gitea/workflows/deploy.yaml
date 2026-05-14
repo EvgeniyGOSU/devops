@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: catthehacker/ubuntu:act-latest
+      options: --volume /var/run/docker.sock:/var/run/docker.sock
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
