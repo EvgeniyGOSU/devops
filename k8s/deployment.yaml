@@ -41,7 +41,7 @@ spec:
         - name: HTTPS_PROXY
           value: "socks5://localhost:1080"
       - name: hysteria
-        image: 192.168.181.134:30500/weather-bot:latest
+        image: tobyxdd/hysteria:latest
         command: ["hysteria"]
         args:
           - client
