@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: bot
-        image: 192.168.181.134:30500/weather-bot:latest
+        image: tobyxdd/hysteria:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
