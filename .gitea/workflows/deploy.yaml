@@ -10,8 +10,17 @@ jobs:
   deploy:
     runs-on: kubernetes
     steps:
+      - name: Setup Git SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GITEA_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 30022 192.168.181.134 >> ~/.ssh/known_hosts
+
       - name: Checkout code
-        uses: actions/checkout@v3
+        run: |
+          git clone ssh://git@192.168.181.134:30022/gosu/devops.git .
+          git checkout ${{ gitea.ref_name }}
 
       - name: Build Docker image
         run: |
