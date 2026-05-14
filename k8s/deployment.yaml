@@ -4,7 +4,7 @@ metadata:
   name: weather-bot
   namespace: weather-bot
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: weather-bot
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: bot
-        image: tobyxdd/hysteria:latest
+        image: 192.168.181.134:30500/weather-bot:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
