@@ -1,0 +1,45 @@
+name: Build and Deploy Weather Bot
+
+on:
+  push:
+    branches:
+      - main
+      - test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/v1.36.0/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mv kubectl /usr/local/bin/kubectl
+
+      - name: Setup kubeconfig
+        run: |
+          mkdir -p /root/.kube
+          echo "${{ secrets.KUBECONFIG }}" > /root/.kube/config
+
+      - name: Build Docker image
+        run: |
+          docker build -t weather-bot:latest .
+
+      - name: Push to registry
+        run: |
+          docker tag weather-bot:latest 192.168.181.134:30500/weather-bot:latest
+          docker push 192.168.181.134:30500/weather-bot:latest
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/secret.yaml -n weather-bot
+          kubectl apply -f k8s/configmap.yaml -n weather-bot
+          kubectl apply -f k8s/deployment.yaml -n weather-bot
+          kubectl apply -f k8s/service.yaml -n weather-bot
+          kubectl rollout restart deployment/weather-bot -n weather-bot
+          kubectl rollout status deployment/weather-bot -n weather-bot
