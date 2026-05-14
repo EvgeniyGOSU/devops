@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
       - name: bot
-        image: weather-bot:latest
-        imagePullPolicy: Never
+        image: registry.weather-bot.svc.cluster.local:5000/weather-bot:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         - containerPort: 9090
