@@ -30,11 +30,13 @@ jobs:
         run: |
           docker build -t weather-bot:latest .
 
-      - name: Save and transfer image
+      - name: Push to registry
         run: |
-          docker save weather-bot:latest -o weather-bot.tar
-          # Копируем образ на worker ноду через kubectl cp (сложно)
-          # Проще загрузить образ в локальный реестр или передать через pipe
+          kubectl port-forward -n weather-bot svc/registry 5000:5000 &
+          sleep 5
+          docker tag weather-bot:latest localhost:5000/weather-bot:latest
+          docker push localhost:5000/weather-bot:latest
+          kill %1
 
       - name: Deploy to Kubernetes
         run: |
