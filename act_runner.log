@@ -31,3 +31,8 @@ time="2026-05-14T15:35:43Z" level=info msg="Running job with maxParallel=1 for 1
 time="2026-05-14T15:35:43Z" level=info msg="NewParallelExecutor: Creating 1 workers for 1 executors"
 time="2026-05-14T15:35:43Z" level=info msg="NewParallelExecutor: Creating 1 workers for 0 executors"
 time="2026-05-14T15:35:43Z" level=info msg="NewParallelExecutor: Creating 1 workers for 0 executors"
+time="2026-05-14T16:27:19Z" level=info msg="task 23 repo is gosu/devops https://github.com http://192.168.181.134:30080"
+time="2026-05-14T16:27:19Z" level=info msg="Running job with maxParallel=1 for 1 matrix combinations"
+time="2026-05-14T16:27:19Z" level=info msg="NewParallelExecutor: Creating 1 workers for 1 executors"
+time="2026-05-14T16:27:19Z" level=info msg="NewParallelExecutor: Creating 1 workers for 0 executors"
+time="2026-05-14T16:27:19Z" level=info msg="NewParallelExecutor: Creating 1 workers for 0 executors"

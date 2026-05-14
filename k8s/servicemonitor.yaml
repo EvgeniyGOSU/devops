@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: weather-bot
-  namespace: default
+  namespace: weather-bot
 spec:
   selector:
     matchLabels:
