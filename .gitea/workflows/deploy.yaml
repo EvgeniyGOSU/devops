@@ -1,62 +1,45 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: weather-bot
-  namespace: weather-bot
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: weather-bot
-  template:
-    metadata:
-      labels:
-        app: weather-bot
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9090"
-        prometheus.io/path: "/metrics"
-    spec:
-      containers:
-      - name: bot
-        image: 192.168.181.134:30500/weather-bot:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8080
-        - containerPort: 9090
-          name: metrics
-        env:
-        - name: TELEGRAM_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: weather-bot-secret
-              key: TELEGRAM_TOKEN
-        - name: WEATHER_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: weather-bot-secret
-              key: WEATHER_API_KEY
-        - name: HTTP_PROXY
-          value: "socks5://localhost:1080"
-        - name: HTTPS_PROXY
-          value: "socks5://localhost:1080"
-      - name: hysteria
-        image: tobyxdd/hysteria:latest
-        command: ["hysteria"]
-        args:
-          - client
-          - -c
-          - /etc/hysteria/config.json
-        ports:
-        - containerPort: 1080
-          protocol: TCP
-        volumeMounts:
-        - name: hysteria-config
-          mountPath: /etc/hysteria
-        env:
-        - name: HYSTERIA_LOG_LEVEL
-          value: "info"
-      volumes:
-      - name: hysteria-config
-        configMap:
-          name: hysteria-config
+name: Build and Deploy Weather Bot
+
+on:
+  push:
+    branches:
+      - main
+      - test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/v1.36.0/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mv kubectl /usr/local/bin/kubectl
+
+      - name: Setup kubeconfig
+        run: |
+          mkdir -p /root/.kube
+          echo "${{ secrets.KUBECONFIG }}" > /root/.kube/config
+
+      - name: Build Docker image
+        run: |
+          docker build -t weather-bot:latest .
+
+      - name: Push to registry
+        run: |
+          docker tag weather-bot:latest 192.168.181.134:30500/weather-bot:latest
+          docker push 192.168.181.134:30500/weather-bot:latest
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/secret.yaml -n weather-bot
+          kubectl apply -f k8s/configmap.yaml -n weather-bot
+          kubectl apply -f k8s/deployment.yaml -n weather-bot
+          kubectl apply -f k8s/service.yaml -n weather-bot
+          kubectl rollout restart deployment/weather-bot -n weather-bot
+          kubectl rollout status deployment/weather-bot -n weather-bot
