@@ -10,10 +10,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     container:
-      image: catthehacker/ubuntu:act-latest
+      image: bitnami/kubectl:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup kubeconfig
+        run: |
+          mkdir -p /root/.kube
+          echo "${{ secrets.KUBECONFIG }}" > /root/.kube/config
 
       - name: Build Docker image
         run: |
@@ -21,9 +26,9 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f k8s/secret.yaml
-          kubectl apply -f k8s/configmap.yaml
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
-          kubectl rollout restart deployment/weather-bot -n default
-          kubectl rollout status deployment/weather-bot -n default
+          kubectl apply -f k8s/secret.yaml -n weather-bot
+          kubectl apply -f k8s/configmap.yaml -n weather-bot
+          kubectl apply -f k8s/deployment.yaml -n weather-bot
+          kubectl apply -f k8s/service.yaml -n weather-bot
+          kubectl rollout restart deployment/weather-bot -n weather-bot
+          kubectl rollout status deployment/weather-bot -n weather-bot
