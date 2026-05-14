@@ -1,0 +1,3 @@
+time="2026-05-14T14:43:09Z" level=info msg="Starting runner daemon"
+time="2026-05-14T14:43:09Z" level=info msg="labels updated to: [ubuntu-latest:host]"
+time="2026-05-14T14:43:09Z" level=info msg="runner: k8s-runner, with version: v0.6.1, with labels: [ubuntu-latest], declare successfully"
