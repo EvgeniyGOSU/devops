@@ -16,12 +16,10 @@ spec:
         prometheus.io/port: "9090"
         prometheus.io/path: "/metrics"
     spec:
-      imagePullSecrets:
-      - name: gitlab-registry
       containers:
       - name: bot
-        image: 192.168.0.199:5050/root/devops:latest
-        imagePullPolicy: Always
+        image: weather-bot:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 8080
         - containerPort: 9090
