@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: weather-bot
+  namespace: weather-bot
 spec:
   replicas: 1
   selector:
@@ -18,8 +19,8 @@ spec:
     spec:
       containers:
       - name: bot
-        image: weather-bot:latest
-        imagePullPolicy: Never
+        image: 192.168.181.134:30500/weather-bot:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         - containerPort: 9090

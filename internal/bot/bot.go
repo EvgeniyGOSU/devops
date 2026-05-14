@@ -43,7 +43,7 @@ func (wb *WeatherBot) startHandler(ctx context.Context, b *bot.Bot, update *mode
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
-		Text:   "🌤️ Привет! Я бот погоды.\nОтправь /weather Moscow, чтобы узнать погоду.",
+		Text:   "🌤️ Привет! Я бот погоды.\nОтправь /weather Moscow (eng), чтобы узнать погоду.",
 	})
 }
 
