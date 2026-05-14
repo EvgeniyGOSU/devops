@@ -1,0 +1,79 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  CI_REGISTRY: "192.168.0.199:5050"
+  CI_REGISTRY_IMAGE: "$CI_REGISTRY/root/devops"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+cache:
+  paths:
+    - go.sum
+    - vendor/
+
+test:
+  stage: test
+  image: golang:1.23-alpine
+  script:
+    - go mod download
+    - go test -v ./...
+  only:
+    - main
+    - test
+
+build:
+  stage: build
+  image: docker:27.0.3
+  services:
+    - docker:dind
+  before_script:
+    - mkdir -p /etc/docker
+    - echo '{"insecure-registries":["192.168.0.199:5050"]}' > /etc/docker/daemon.json
+    - docker login -u root -p "$GITLAB_PASSWORD" "$CI_REGISTRY"
+  script:
+    # Собираем и пушим образ с тегом ветки (main или test)
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    
+    # Для main также пушим с тегом latest (опционально)
+    - |
+      if [ "$CI_COMMIT_REF_NAME" == "main" ]; then
+        docker tag $CI_REGISTRY_IMAGE:main $CI_REGISTRY_IMAGE:latest
+        docker push $CI_REGISTRY_IMAGE:latest
+      fi
+  only:
+    - main
+    - test
+
+# Деплой в test окружение
+deploy-test:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    # Если нет отдельного namespace test, создаём его
+    - kubectl create namespace test --dry-run=client -o yaml | kubectl apply -f -
+    # Деплоим из файла с подстановкой окружения
+    - |
+      cat k8s/deployment.yaml | \
+        sed "s|image: .*|image: $CI_REGISTRY_IMAGE:test|g" | \
+        kubectl apply -f - -n test
+    - kubectl rollout status deployment/weather-bot -n test
+  environment:
+    name: test
+  only:
+    - test
+
+# Деплой в production окружение (main)
+deploy-prod:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl rollout restart deployment/weather-bot -n default
+    - kubectl rollout status deployment/weather-bot -n default
+  environment:
+    name: production
+  only:
+    - main
