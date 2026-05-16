@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitea-ingress
+  namespace: gitea
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - git.evgeniy.ru
+    secretName: git-evgeniy-ru-tls-selfsigned
+  rules:
+  - host: git.evgeniy.ru
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gitea
+            port:
+              number: 3000
