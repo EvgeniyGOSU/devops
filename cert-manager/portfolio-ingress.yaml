@@ -4,13 +4,10 @@ metadata:
   name: portfolio-ingress
   namespace: portfolio
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - gosu-devops.ru
-    secretName: gosu-devops-ru-tls
   rules:
   - host: gosu-devops.ru
     http:
