@@ -37,7 +37,6 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f k8s/secret.yaml -n weather-bot
           kubectl apply -f k8s/configmap.yaml -n weather-bot
           kubectl apply -f k8s/deployment.yaml -n weather-bot
           kubectl apply -f k8s/service.yaml -n weather-bot
