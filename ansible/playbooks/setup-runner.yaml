@@ -1,0 +1,64 @@
+---
+- name: Setup Gitea Runner on worker node
+  hosts: worker
+  become: yes
+  tasks:
+    - name: Download act_runner binary
+      get_url:
+        url: https://dl.gitea.com/act_runner/0.6.1/act_runner-0.6.1-linux-amd64
+        dest: /tmp/act_runner
+        mode: '0755'
+
+    - name: Install act_runner
+      copy:
+        src: /tmp/act_runner
+        dest: /usr/local/bin/act_runner
+        mode: '0755'
+        remote_src: yes
+
+    - name: Create runner working directory
+      file:
+        path: /var/lib/act_runner
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Register runner
+      command: |
+        /usr/local/bin/act_runner register \
+          --instance https://git.gosu-devops.ru \
+          --token {{ runner_token }} \
+          --name k8s-worker-runner \
+          --labels ubuntu-latest \
+          --no-interactive
+      args:
+        chdir: /var/lib/act_runner
+        creates: /var/lib/act_runner/.runner
+
+    - name: Create systemd service
+      copy:
+        content: |
+          [Unit]
+          Description=Gitea Actions Runner
+          After=network.target
+
+          [Service]
+          Type=simple
+          ExecStart=/usr/local/bin/act_runner daemon
+          WorkingDirectory=/var/lib/act_runner
+          Restart=always
+          RestartSec=10
+          User=root
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/act_runner.service
+        mode: '0644'
+
+    - name: Enable and start runner service
+      systemd:
+        name: act_runner
+        enabled: yes
+        state: started
+        daemon_reload: yes

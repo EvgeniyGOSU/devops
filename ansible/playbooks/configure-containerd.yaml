@@ -1,0 +1,31 @@
+---
+- name: Configure containerd on worker node
+  hosts: worker
+  become: yes
+  tasks:
+    - name: Ensure containerd config directory exists
+      file:
+        path: /etc/containerd
+        state: directory
+        mode: '0755'
+
+    - name: Configure containerd for insecure registry
+      copy:
+        content: |
+          version = 2
+          [plugins."io.containerd.grpc.v1.cri".registry]
+            [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+              [plugins."io.containerd.grpc.v1.cri".registry.mirrors."192.168.181.133:30500"]
+                endpoint = ["http://192.168.181.133:30500"]
+            [plugins."io.containerd.grpc.v1.cri".registry.configs]
+              [plugins."io.containerd.grpc.v1.cri".registry.configs."192.168.181.133:30500".tls]
+                insecure_skip_verify = true
+        dest: /etc/containerd/config.toml
+      register: containerd_config
+
+    - name: Restart containerd
+      systemd:
+        name: containerd
+        state: restarted
+        daemon_reload: yes
+      when: containerd_config.changed

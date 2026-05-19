@@ -1,0 +1,26 @@
+---
+- name: Configure Docker on all nodes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure docker daemon directory exists
+      file:
+        path: /etc/docker
+        state: directory
+        mode: '0755'
+
+    - name: Configure insecure registry
+      copy:
+        content: |
+          {
+            "insecure-registries": ["192.168.181.133:30500"]
+          }
+        dest: /etc/docker/daemon.json
+      register: docker_config
+
+    - name: Restart docker
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes
+      when: docker_config.changed

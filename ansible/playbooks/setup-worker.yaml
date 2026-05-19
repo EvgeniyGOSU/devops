@@ -1,0 +1,8 @@
+---
+- name: Full worker node setup
+  hosts: worker
+  become: yes
+  tasks:
+    - include_tasks: configure-docker.yaml
+    - include_tasks: configure-containerd.yaml
+    - include_tasks: setup-runner.yaml
