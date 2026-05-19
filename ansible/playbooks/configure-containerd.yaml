@@ -9,7 +9,7 @@
         state: directory
         mode: '0755'
 
-    - name: Configure containerd for insecure registry
+    - name: Configure containerd for insecure registry on master
       copy:
         content: |
           version = 2
@@ -26,6 +26,13 @@
     - name: Restart containerd
       systemd:
         name: containerd
+        state: restarted
+        daemon_reload: yes
+      when: containerd_config.changed
+
+    - name: Restart kubelet
+      systemd:
+        name: kubelet
         state: restarted
         daemon_reload: yes
       when: containerd_config.changed
