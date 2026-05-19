@@ -9,6 +9,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+      options: --volume /var/run/docker.sock:/var/run/docker.sock
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,7 +20,7 @@ jobs:
         run: |
           curl -LO "https://dl.k8s.io/release/v1.36.0/bin/linux/amd64/kubectl"
           chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/kubectl
+          mv kubectl /usr/local/bin/kubectl
 
       - name: Setup kubeconfig
         run: |
