@@ -28,4 +28,5 @@ Thumbs.db
 .env
 *.key
 *.pem
-EOF
+EOFk8s/secret.yaml
+k8s/secret.yaml
