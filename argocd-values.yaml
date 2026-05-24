@@ -1,0 +1,29 @@
+global:
+  domain: argocd.gosu-devops.ru
+
+configs:
+  cm:
+    admin.enabled: "true"
+    url: https://argocd.gosu-devops.ru
+    timeout.reconciliation: 120s
+
+server:
+  service:
+    type: NodePort
+    nodePortHttp: 30380
+  hostAliases:
+    - ip: "10.233.47.165"
+      hostnames:
+        - "git.gosu-devops.ru"
+
+repoServer:
+  hostAliases:
+    - ip: "10.233.47.165"
+      hostnames:
+        - "git.gosu-devops.ru"
+
+applicationController:
+  hostAliases:
+    - ip: "10.233.47.165"
+      hostnames:
+        - "git.gosu-devops.ru"
