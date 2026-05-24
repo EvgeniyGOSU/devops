@@ -1,29 +1,91 @@
+# Argo CD Helm Values
+# Установка: helm install argocd argo/argo-cd -n argocd --create-namespace -f argocd-values.yaml
+
+fullnameOverride: argocd
+
 global:
-  domain: argocd.gosu-devops.ru
+  image:
+    tag: v3.4.2
 
-configs:
-  cm:
-    admin.enabled: "true"
-    url: https://argocd.gosu-devops.ru
-    timeout.reconciliation: 120s
+# Отключаем ненужные компоненты
+dex:
+  enabled: false
 
+notifications:
+  enabled: false
+
+applicationSet:
+  enabled: false
+
+# Настройка сервера
 server:
   service:
     type: NodePort
     nodePortHttp: 30380
-  hostAliases:
-    - ip: "10.233.47.165"
-      hostnames:
-        - "git.gosu-devops.ru"
+    nodePortHttps: 30443
+    servicePortHttp: 80
+    servicePortHttps: 443
+  extraArgs:
+    - --insecure
+  config:
+    url: https://argocd.gosu-devops.ru
+  ingress:
+    enabled: false
+  # Настройка ресурсов
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
 
+# Репозиторий сервер
 repoServer:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  # Добавляем hostAliases для доступа к Gitea
   hostAliases:
-    - ip: "10.233.47.165"
+    - ip: "192.168.181.134"
       hostnames:
         - "git.gosu-devops.ru"
 
+# Контроллер приложений
 applicationController:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  # Добавляем hostAliases для доступа к Gitea
   hostAliases:
-    - ip: "10.233.47.165"
+    - ip: "192.168.181.134"
       hostnames:
         - "git.gosu-devops.ru"
+
+# Redis
+redis:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Configs
+configs:
+  params:
+    server.insecure: "true"
+  cm:
+    url: https://argocd.gosu-devops.ru
+    timeout.reconciliation: 120s
+    accounts.weather-bot: apiKey,login
+
